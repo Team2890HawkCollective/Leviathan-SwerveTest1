@@ -14,11 +14,16 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
+@SuppressWarnings("unused")
 public final class Constants
 {
     // Kinematics measurement for Swerve Drive.
     public static final double DISTANCE_FROM_CENTER = 0.175;  // meters
     public static final double RADIUS_OF_WHEEL = 0.05013;     // meters
+
+    private static final int LAMPREY_ENCODER_RESOLUTION = 1024;  // 10-bit encoder. 2^10=1024
+
+    public static final int GYRO_PORT = 0;
 
     /**
      * CAN IDs for TalonSRX Controllers for Steering Motors
@@ -56,7 +61,7 @@ public final class Constants
     /**
      * Speed modifiers for Teleop
      */
-    public static final double TELEOP_DRIVE_SPEED_MODIFIER = 0.15;
+    public static final double TELEOP_DRIVE_SPEED_MODIFIER = 0.20;
     public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.5;
     public static final double NO_SPEED = 0.0;
     public static final double LIFT_CONTROLLER_RELEASE_SPEED = 0.25;

@@ -8,16 +8,18 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-// Swerve Drive imports
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.AnalogGyro;
 
 import frc.robot.Constants;
 
@@ -42,18 +44,15 @@ public class DriveTrainSubsystem extends SubsystemBase {
    * TalonSRX Controllers - SwerveDrive PG Steer Motors (PG)
    */
   private WPI_TalonSRX leftFrontTalonSRX = new WPI_TalonSRX(Constants.LEFT_FRONT_TALON_SRX_ID);
-  // private WPI_TalonSRX leftBackTalonSRX = new
-  // WPI_TalonSRX(Constants.LEFT_BACK_SPARK_MAX_ID);
-  private WPI_TalonSRX rightFrontTalonSRX = new WPI_TalonSRX(Constants.RIGHT_FRONT_SPARK_MAX_ID);
-  // private WPI_TalonSRX rightBackTalxonSRX = new
-  // WPI_TalonSRX(Constants.RIGHT_BACK_SPARK_MAX_ID);
+  private WPI_TalonSRX leftBackTalonSRX = new WPI_TalonSRX(Constants.LEFT_BACK_TALON_SRX_ID);
+  private WPI_TalonSRX rightFrontTalonSRX = new WPI_TalonSRX(Constants.RIGHT_FRONT_TALON_SRX_ID);
+  private WPI_TalonSRX rightBackTalonSRX = new WPI_TalonSRX(Constants.RIGHT_BACK_TALON_SRX_ID);
 
   // Lamprey encoder - SwerveDrive
-  // DevNote: Figure out Lamprey encoder class name and imports.
-  // private RelativeEncoder leftFrontSteeringEncoder = ???.getEncoder();
-  // private RelativeEncoder leftBackSteeringEncoder = ???.getEncoder();
-  // private RelativeEncoder rightFrontSteeringEncoder = ???.getEncoder();
-  // private RelativeEncoder rightBackSteeringEncoder = ???.getEncoder();
+  private RelativeEncoder leftFrontSteeringEncoder = leftFrontTalonSRX.getEncoder();
+  private RelativeEncoder leftBackSteeringEncoder = leftBackTalonSRX.getEncoder();
+  private RelativeEncoder rightFrontSteeringEncoder = rightFrontTalonSRX.getEncoder();
+  private RelativeEncoder rightBackSteeringEncoder = rightBackTalonSRX.getEncoder();
 
   // private XboxController assistantDriverController = new
   // XboxController(Constants.XBOX_ASSISTANT_DRIVER_CONTROLLER_ID);
@@ -65,23 +64,31 @@ public class DriveTrainSubsystem extends SubsystemBase {
   private XboxController driverController = new XboxController(Constants.XBOX_DRIVER_CONTROLLER_PORT_ID);
 
   /**
-   * SwerveDrive Kinematics
+   * Swerve Drive Kinematics
+   * The SwerveDriveKinematics class is a useful tool that converts between a
+   * ChassisSpeeds object and several SwerveModuleState objects, which contains
+   * velocities and angles for each swerve module of a swerve drive robot.
    */
   // Locations for the swerve drive modules relative to the robot center.
-  Translation2d m_frontLeftLocation = new Translation2d(Constants.DISTANCE_FROM_CENTER, Constants.DISTANCE_FROM_CENTER);
+  Translation2d m_frontLeftLocation = new Translation2d(Constants.DISTANCE_FROM_CENTER,
+      Constants.DISTANCE_FROM_CENTER);
   Translation2d m_frontRightLocation = new Translation2d(Constants.DISTANCE_FROM_CENTER,
       -Constants.DISTANCE_FROM_CENTER);
-  Translation2d m_backLeftLocation = new Translation2d(-Constants.DISTANCE_FROM_CENTER, Constants.DISTANCE_FROM_CENTER);
+  Translation2d m_backLeftLocation = new Translation2d(-Constants.DISTANCE_FROM_CENTER,
+      Constants.DISTANCE_FROM_CENTER);
   Translation2d m_backRightLocation = new Translation2d(-Constants.DISTANCE_FROM_CENTER,
       -Constants.DISTANCE_FROM_CENTER);
+
   // Creating my kinematics object using the module locations
   SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
-  // Chassis speeds: 1 meter per second forward, 3 meters
+  private final AnalogGyro m_gyro = new AnalogGyro(Constants.GYRO_PORT);
+
+  // Example chassis speeds: 1 meter per second forward, 3 meters
   // per second to the left, and rotation at 1.5 radians per second
   // counterclockwise.
-  ChassisSpeeds speeds = new ChassisSpeeds(1.0, 3.0, 1.5);  // DevNote: Fix these params.
+  ChassisSpeeds speeds = new ChassisSpeeds(1.0, 3.0, 1.5);
 
   // Convert to module states
   SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(speeds);
@@ -212,11 +219,14 @@ public class DriveTrainSubsystem extends SubsystemBase {
       // Drive motors
       leftFrontSparkMax.set(leftSpeed);
       rightFrontSparkMax.set(rightSpeed);
-      // leftBackSparkMax.set(leftSpeed);
-      // rightBackSparkMax.set(rightSpeed);
+      leftBackSparkMax.set(leftSpeed);
+      rightBackSparkMax.set(rightSpeed);
 
       // Steer motors
-      rightFrontTalonSRX.set(rightSpeed);
+      leftFrontTalonSRX.set(leftSpeed);
+      rightFrontTalonSRX.set(rightSpeed); // DevNote: has an assembly mechanical problem. Need fix.
+      leftBackTalonSRX.set(leftSpeed);
+      rightBackTalonSRX.set(rightSpeed);
     }
   }
 }
